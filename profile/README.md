@@ -2,49 +2,35 @@
 
 # PerfOpsLab
 
-**GitHub-организация** behind **[Critical Systems Advisory](https://maslinka.ohbah.com:8443/)** — *launch-readiness, reliability, and cloud efficiency* для команд, где инфраструктура и AI **влияют на выручку**.
+### **Critical Systems Advisory**
 
-[Лендинг](https://maslinka.ohbah.com:8443/) · [Book 20 min](https://maslinka.ohbah.com:8443/book) · [Pricing](https://maslinka.ohbah.com:8443/pricing) · [Код лендинга](https://github.com/PerfOpsLab/perfops-consulting-site)
+**Launch-ready. Reliable. Spend under control.**
+
+AI infra · performance · FinOps — one fight, not three silos.
+
+Cyprus · revenue-critical teams only
 
 </div>
 
 ---
 
-## Сайт — источник правды по офферу
+Speed is not vanity. **Latency is margin.** Inference is not magic — it is **metered burn**. We fuse APM, logs, traces, load, and cloud bill into a single decision surface: what breaks revenue *first*, what costs *most*, who *owns* the fix.
 
-Всё, что **продукт, треки, доказательства и контакты** — на [maslinka.ohbah.com:8443](https://maslinka.ohbah.com:8443/). Здесь кратко то же позиционирование, плюс инженерный слой org.
+**Sense.** One map: journeys, saturation, errors, unit economics.  
+**Decide.** Ranked bottlenecks and spend leaks — impact, urgency, effort.  
+**Govern.** Release gates, scaling rules, AI cost guardrails — named owners, no folklore.
 
-**Фокус:** AI Infra / Performance / FinOps — скорость воронки, безопасные релизы, **стоимость запроса** и управляемый AI/spend.
+**Signal Scan** — fast external read before you bet the quarter on a launch.  
+**AI Infra Control Sprint** — baseline cost-per-request, full telemetry + billing pass, control memo for engineering, product, and finance.
 
-**Петля решений (как на сайте):**
-
-| Sense | Decide | Govern |
-|--------|--------|--------|
-| APM, логи, трейсы, нагрузка, биллинг в одной картине | Приоритет узких мест и утечек spend по **влиянию на выручку** и срочности | Guardrails релизов, масштабирования и **AI cost** с владельцами |
-
----
-
-## Стартовые форматы (с лендинга)
-
-- **Signal Scan** — быстрый внешний взгляд перед релизом, кампанией или инфра-решением; короткий shortlist узких мест и рисков.
-- **AI Infra Control Sprint** — baseline cost-per-request / inference, разбор APM · logs · traces · billing · load, **control memo** для infra / product / finance.
-
-Полный каталог и условия — на [Pricing](https://maslinka.ohbah.com:8443/pricing). Заявка и контакт — через форму на [главной](https://maslinka.ohbah.com:8443/).
+No hundred-slide therapy. **Memos. Metrics. Motion.**
 
 ---
 
-## Инженерия под капотом (кратко)
-
-Нагрузка (в т.ч. k6 + CI), наблюдаемость (Prometheus / Grafana / алерты), интеграции **Slack · Jira** и автоматизация (**n8n**, GitHub Actions). При необходимости — **auto-router моделей**, **редуктор логов перед LLM** под ваш стек.
-
----
-
-## Инструментарий: AI-агенты без лишних токенов
-
-Ниже — **универсальные промпты** для Cursor / Claude / GPT и multi-agent схем: один шаблон, жёсткий формат вывода, orchestrator + workers. Экономит контекст и ускоряет итерации на perf-задачах.
+## Agent toolkit — minimal tokens, maximal signal
 
 <details>
-<summary><strong>Универсальный промпт (копипаста)</strong></summary>
+<summary><strong>Universal prompt (copy)</strong></summary>
 
 ```text
 You are a senior {role}.
@@ -85,7 +71,7 @@ Return format:
 </details>
 
 <details>
-<summary><strong>Добавки: STRICT · JSON · PERF/LOAD · DEBUG · CODE</strong></summary>
+<summary><strong>Add-ons: STRICT · JSON · PERF/LOAD · DEBUG · CODE</strong></summary>
 
 **STRICT**
 
@@ -129,7 +115,7 @@ No explanations.
 </details>
 
 <details>
-<summary><strong>Orchestrator + Worker</strong></summary>
+<summary><strong>Orchestrator + worker</strong></summary>
 
 **Orchestrator**
 
@@ -172,22 +158,8 @@ Task:
 </details>
 
 <details>
-<summary><strong>Паттерн использования</strong></summary>
+<summary><strong>Pattern</strong></summary>
 
-| Плохо | Хорошо |
-|--------|--------|
-| Один агент делает всё → много токенов | Orchestrator делит → workers исполняют |
-
-**TL;DR:** один шаблон, единый формат ответа, меньше шума в контексте — удобно для multi-agent и perf-разборов.
+One brain doing everything burns tokens and time. **Split:** orchestrator plans, workers execute, output stays structured.
 
 </details>
-
----
-
-<div align="center">
-
-**PerfOpsLab** · Кипр · **[Critical Systems Advisory](https://maslinka.ohbah.com:8443/)**
-
-[Book 20 min](https://maslinka.ohbah.com:8443/book) · [Открыть лендинг](https://maslinka.ohbah.com:8443/)
-
-</div>
