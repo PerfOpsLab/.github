@@ -1,10 +1,46 @@
+<div align="center">
+
 # PerfOpsLab
 
-Универсальные промпты под **ohbah / Cursor / Claude / GPT**: минимум токенов, orchestration, задачи PerfOps.
+**Performance engineering для продуктовых команд:** нагрузка, узкие места, наблюдаемость, устойчивый релизный ритм.
+
+[Сайт](https://maslinka.ohbah.com:8443/) · [Репозиторий лендинга](https://github.com/PerfOpsLab/perfops-consulting-site) · [Организация](https://github.com/PerfOpsLab)
+
+</div>
 
 ---
 
-## Универсальный промпт (копипаста)
+## Зачем нам пишут
+
+Мы помогаем, когда **рост трафика или сложность системы** упирается не в «ещё один инстанс», а в понятную картину: где теряется время, что измерять до и после изменений, как не ловить регрессии на проде.
+
+| Вызов | Как работаем |
+|--------|----------------|
+| «Не знаем, выдержит ли релиз пик» | Сценарии нагрузки, SLO/бюджеты ошибок, проверяемые метрики |
+| «Горит прод, логи бесконечные» | Сужение сигнала: трассировки, корреляции, приоритет фиксов |
+| «Инженеры тонут в рутине» | Автоматизация пайплайнов, дашборды, дисциплина наблюдаемости |
+
+Итог для бизнеса: **меньше неожиданных инцидентов, быстрее уверенные релизы, прозрачные цифры для продукта и финансов.**
+
+---
+
+## Что предлагаем (как B2B-партнёр по перфу)
+
+1. **Диагностика и план** — карта рисков, quick wins vs фундамент.
+2. **Нагрузочное и регрессионное покрытие** — k6 и связка с вашим CI/CD.
+3. **Наблюдаемость под решения** — Grafana / Prometheus / алерты под ваш стек (в т.ч. Slack, Jira).
+4. **Сопровождение релизов** — критерии готовности, постмортемы без воды.
+
+Нужен **auto-router моделей**, **n8n / GitHub Actions**, **редуктор логов перед LLM** — собираем под ваш стек (k6, Grafana, Slack, Jira и др.).
+
+---
+
+## Инструментарий: AI-агенты без лишних токенов
+
+Ниже — **универсальные промпты** для Cursor / Claude / GPT и multi-agent схем: один шаблон, жёсткий формат вывода, orchestrator + workers. Экономит контекст и ускоряет итерации на perf-задачах.
+
+<details>
+<summary><strong>Универсальный промпт (копипаста)</strong></summary>
 
 ```text
 You are a senior {role}.
@@ -42,11 +78,12 @@ Return format:
 {choose ONE: JSON | bullets | table | code}
 ```
 
----
+</details>
 
-## Добавки (вставляй при необходимости)
+<details>
+<summary><strong>Добавки: STRICT · JSON · PERF/LOAD · DEBUG · CODE</strong></summary>
 
-### STRICT (макс экономия)
+**STRICT**
 
 ```text
 Return only final answer.
@@ -54,14 +91,14 @@ No explanations.
 Maximize information density.
 ```
 
-### JSON (для агентов / API)
+**JSON**
 
 ```text
 Return ONLY valid JSON.
 No text outside JSON.
 ```
 
-### PERF / LOAD
+**PERF / LOAD**
 
 ```text
 Return:
@@ -70,7 +107,7 @@ Return:
 - fixes (priority order)
 ```
 
-### DEBUG
+**DEBUG**
 
 ```text
 Return:
@@ -78,16 +115,19 @@ Return:
 - fix
 ```
 
-### CODE
+**CODE**
 
 ```text
 Return only code.
 No explanations.
 ```
 
----
+</details>
 
-## Orchestrator (главный агент)
+<details>
+<summary><strong>Orchestrator + Worker</strong></summary>
+
+**Orchestrator**
 
 ```text
 You are an orchestration agent.
@@ -111,9 +151,7 @@ Format:
 }
 ```
 
----
-
-## Worker (исполнитель)
+**Worker**
 
 ```text
 You are a {specialist}.
@@ -127,20 +165,25 @@ Task:
 {task}
 ```
 
----
+</details>
 
-## Как использовать
+<details>
+<summary><strong>Паттерн использования</strong></summary>
 
 | Плохо | Хорошо |
 |--------|--------|
-| Один агент → всё → много токенов | Orchestrator делит → workers делают |
+| Один агент делает всё → много токенов | Orchestrator делит → workers исполняют |
 
-**TL;DR:** один шаблон, везде, меньше токенов, удобно под multi-agent.
+**TL;DR:** один шаблон, единый формат ответа, меньше шума в контексте — удобно для multi-agent и perf-разборов.
+
+</details>
 
 ---
 
-## Репозитории
+<div align="center">
 
-- [perfops-consulting-site](https://github.com/PerfOpsLab/perfops-consulting-site) — лендинг и документация PerfOps.
+**PerfOpsLab** · Кипр · Инженерия производительности и надёжности продукта
 
-Если нужны **auto-router** (модель под задачу), **n8n / GitHub pipeline**, **авто-редуктор логов перед LLM** — пиши под стек (k6, Grafana, Slack, Jira).
+*Напишите, с чего начать: нагрузка, инцидент, аудит наблюдаемости или зрелость пайплайна.*
+
+</div>
