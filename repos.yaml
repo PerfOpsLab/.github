@@ -83,13 +83,13 @@ product_lines:
           target: vps
           service: telegram-reminder-simple.service
         ci: [reusable-ci-go, reusable-security-gate]
+  transferred_out:
+    description: Formerly in the org, now owned by individuals. Listed for traceability.
+    repos:
       - name: polymarket-arb
-        stack: python
-        deploy:
-          target: vps
-          mode: docker-compose
-        ci: [reusable-ci-node, reusable-security-gate]
-        notes: Owner asked to migrate this out of the org (issue #15) — pending decision.
+        new_location: muntianus/polymarket-arb
+        transferred_at: "2026-05-06"
+        notes: Continues to call PerfOpsLab/.github reusable workflows (the .github repo is public).
 
   content:
     description: Public-facing or marketing repos.
