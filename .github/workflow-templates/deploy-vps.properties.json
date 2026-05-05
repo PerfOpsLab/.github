@@ -1,0 +1,6 @@
+{
+  "name": "PerfOps Deploy to VPS",
+  "description": "Manual VPS deploy via SSH/SCP. Edit service_name, app_dir, source_glob, health_url before first run.",
+  "iconName": "octicon rocket",
+  "categories": ["Deployment"]
+}

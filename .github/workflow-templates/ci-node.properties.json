@@ -1,0 +1,6 @@
+{
+  "name": "PerfOps Node CI",
+  "description": "Lint, typecheck, test, build for Node.js / Next.js projects via the org reusable workflow.",
+  "iconName": "octicon code",
+  "categories": ["Continuous integration", "JavaScript", "TypeScript"]
+}

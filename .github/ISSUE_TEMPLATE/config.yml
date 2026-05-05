@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Org guidance
+    url: https://github.com/PerfOpsLab/.github/blob/main/AGENTS.md
+    about: Read the unified agent guidance before opening an issue.
+  - name: Repo map
+    url: https://github.com/PerfOpsLab/.github/blob/main/repos.yaml
+    about: All repositories with owners, stack, and deploy info.

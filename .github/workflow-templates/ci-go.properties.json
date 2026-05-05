@@ -1,0 +1,6 @@
+{
+  "name": "PerfOps Go CI",
+  "description": "Go build, test, gofmt, go vet, golangci-lint via the org reusable workflow.",
+  "iconName": "octicon code",
+  "categories": ["Continuous integration", "Go"]
+}

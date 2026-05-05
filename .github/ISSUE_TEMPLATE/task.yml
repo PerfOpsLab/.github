@@ -1,0 +1,37 @@
+name: Task
+description: Concrete unit of work scoped to a single PR.
+title: "[TASK] "
+labels: ["type/task"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What does done look like?
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Why does this matter? Link to epic / Linear ticket if any.
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Requirements
+      description: Bullet list of what the implementation must do.
+  - type: input
+    id: linear
+    attributes:
+      label: Linear ID
+      placeholder: YAP-NNN
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - "priority/p2 — normal"
+        - "priority/p1 — high"
+        - "priority/p0 — critical"
+        - "priority/p3 — backlog"
+      default: 0

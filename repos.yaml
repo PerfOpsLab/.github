@@ -1,0 +1,124 @@
+# PerfOpsLab repository manifest.
+# Source of truth for: stack, owner, deploy target, and CI configuration.
+# Updated when adding/removing/transferring a repo.
+
+version: 1
+
+product_lines:
+  launch_gate:
+    description: Release-gate engine and surrounding tooling.
+    repos:
+      - name: launchgate
+        stack: go
+        deploy:
+          target: vps
+          service: launchgate.service
+          path: /root/launchgate
+          internal_url: http://127.0.0.1:18080
+        ci: [reusable-ci-go, reusable-security-gate]
+      - name: reportkit
+        stack: go
+        ci: [reusable-ci-go, reusable-security-gate]
+      - name: perfops-action
+        stack: go
+        kind: github-action
+        ci: [reusable-ci-go, reusable-security-gate]
+      - name: perfops-sdk
+        stack: go-python
+        ci: [reusable-ci-go, reusable-security-gate]
+      - name: k6-scenarios
+        stack: javascript-k6
+        ci: [reusable-security-gate]
+      - name: chaos-scenarios
+        stack: javascript-k6
+        ci: [reusable-security-gate]
+      - name: benchmark-apps
+        stack: go
+        ci: [reusable-ci-go, reusable-security-gate]
+      - name: perfops-templates
+        stack: yaml-md
+        ci: [reusable-security-gate]
+      - name: nfr-library
+        stack: yaml-md
+        visibility: public
+        ci: [reusable-security-gate]
+      - name: grafana-dashboards
+        stack: grafana-json
+        ci: [reusable-security-gate]
+      - name: iac-monitoring-agent
+        stack: shell
+        deploy:
+          target: vps
+          mode: push-deploy
+        ci: [reusable-security-gate]
+
+  saas:
+    description: Customer-facing SaaS surface.
+    repos:
+      - name: perfOps
+        stack: javascript-pocketbase
+        ci: [reusable-ci-node, reusable-security-gate]
+      - name: perfops-consulting-site
+        stack: nextjs
+        deploy:
+          target: vps
+          service: perfops-site.service
+          path: /home/jarvis/perfops-consulting-site
+          internal_url: http://127.0.0.1:3001/health
+          public_url: https://maslinka.ohbah.com:8443/
+        ci: [reusable-ci-node, reusable-security-gate, reusable-deploy-vps]
+
+  bots:
+    description: Telegram bots and side projects.
+    repos:
+      - name: telegram-reminder
+        stack: go
+        deploy:
+          target: vps
+          service: telegram-reminder.service
+        ci: [reusable-ci-go, reusable-security-gate]
+      - name: telegram-reminder-simple
+        stack: go
+        deploy:
+          target: vps
+          service: telegram-reminder-simple.service
+        ci: [reusable-ci-go, reusable-security-gate]
+      - name: polymarket-arb
+        stack: python
+        deploy:
+          target: vps
+          mode: docker-compose
+        ci: [reusable-ci-node, reusable-security-gate]
+        notes: Owner asked to migrate this out of the org (issue #15) — pending decision.
+
+  content:
+    description: Public-facing or marketing repos.
+    repos:
+      - name: ".github"
+        stack: meta
+        visibility: public
+        notes: Org profile, agent guidance, reusable workflows, this manifest.
+      - name: awesome-performance-engineering
+        stack: md
+        visibility: public
+      - name: muntianus-portfolio
+        stack: typescript
+
+  legacy_or_offshore:
+    description: Repos owned by non-PerfOps initiatives, kept for now.
+    repos:
+      - name: globex
+        stack: react-fastapi-flutter
+        notes: B2B marketplace exploration project.
+      - name: order-lab
+        stack: go-kafka
+      - name: ig-unfollow
+        stack: nodejs-playwright
+
+  archived_candidates:
+    description: To be archived in cleanup pass — not active development.
+    repos:
+      - name: demo-repository
+        action: archive
+      - name: improved-parakeet-demo-repository
+        action: archive
