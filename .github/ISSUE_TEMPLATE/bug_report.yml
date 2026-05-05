@@ -31,8 +31,8 @@ body:
     attributes:
       label: Priority
       options:
-        - "priority/p1 — should be in next sprint"
-        - "priority/p0 — block prod reliability/revenue"
+        - "priority/p0 — critical"
+        - "priority/p1 — high"
         - "priority/p2 — normal"
         - "priority/p3 — backlog"
-      default: 0
+      default: 2
