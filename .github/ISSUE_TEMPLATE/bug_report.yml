@@ -1,0 +1,38 @@
+name: Bug report
+description: Something is broken in production or in a release branch.
+title: "[BUG] "
+labels: ["type/bug"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: One sentence — what's broken.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: Minimal steps. Include URLs, payloads, env if relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Who is affected? Revenue / SLO impact?
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - "priority/p1 — should be in next sprint"
+        - "priority/p0 — block prod reliability/revenue"
+        - "priority/p2 — normal"
+        - "priority/p3 — backlog"
+      default: 0

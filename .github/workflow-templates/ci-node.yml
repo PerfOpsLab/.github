@@ -1,0 +1,14 @@
+name: Node CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: PerfOpsLab/.github/.github/workflows/reusable-ci-node.yml@main

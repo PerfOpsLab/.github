@@ -1,0 +1,6 @@
+{
+  "name": "PerfOps Security Gate",
+  "description": "Org-wide security checks: gitleaks, npm audit, govulncheck.",
+  "iconName": "octicon shield",
+  "categories": ["Security"]
+}

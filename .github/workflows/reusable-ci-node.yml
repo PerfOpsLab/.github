@@ -1,0 +1,61 @@
+name: Reusable Node CI
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        required: false
+        default: "20"
+        type: string
+      install_cmd:
+        required: false
+        default: "npm ci"
+        type: string
+      run_cmd:
+        description: Aggregated check command (lint+typecheck+test+build). Empty disables.
+        required: false
+        default: "npm run check"
+        type: string
+      fallback_cmds:
+        description: Newline-separated commands run when run_cmd is empty.
+        required: false
+        default: |
+          npm run lint --if-present
+          npm run typecheck --if-present
+          npm test --if-present
+          npm run build --if-present
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: Lint · typecheck · test · build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      INSTALL_CMD: ${{ inputs.install_cmd }}
+      RUN_CMD: ${{ inputs.run_cmd }}
+      FALLBACK_CMDS: ${{ inputs.fallback_cmds }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: "npm"
+      - name: Install
+        run: bash -c "$INSTALL_CMD"
+      - name: Run aggregated check
+        if: ${{ inputs.run_cmd != '' }}
+        run: bash -c "$RUN_CMD"
+      - name: Run fallback steps
+        if: ${{ inputs.run_cmd == '' }}
+        run: |
+          set -e
+          while IFS= read -r line; do
+            line="$(echo "$line" | sed 's/^ *//; s/ *$//')"
+            [ -z "$line" ] && continue
+            echo "+ $line"
+            bash -c "$line"
+          done <<< "$FALLBACK_CMDS"

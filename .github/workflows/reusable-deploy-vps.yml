@@ -1,0 +1,206 @@
+name: Reusable VPS deploy
+
+# Deploys a service via SSH/SCP to a single PerfOpsLab VPS.
+#
+# Required repository secrets:
+#   VPS_HOST, VPS_USER, VPS_PORT, VPS_SSH_KEY
+#
+# Caller defines what to deploy and how to verify. A repo can call this
+# multiple times with different inputs to deploy multiple services.
+
+on:
+  workflow_call:
+    inputs:
+      service_name:
+        description: systemd unit name, e.g. perfops-site.service.
+        required: true
+        type: string
+      app_dir:
+        description: Absolute target directory on the VPS.
+        required: true
+        type: string
+      source_glob:
+        description: Comma-separated source paths (passed to appleboy/scp-action).
+        required: true
+        type: string
+      clean_paths:
+        description: Newline-separated paths to remove on the VPS before upload.
+        required: false
+        default: ""
+        type: string
+      build_cmd:
+        description: Optional pre-upload local build command. Empty skips.
+        required: false
+        default: ""
+        type: string
+      remote_setup:
+        description: Newline-separated commands run on the VPS before deploy script.
+        required: false
+        default: ""
+        type: string
+      deploy_script:
+        description: Path on the VPS (after upload) that performs the actual deploy. Empty falls back to systemctl restart only.
+        required: false
+        default: ""
+        type: string
+      health_url:
+        description: Internal URL on the VPS for post-deploy smoke. Empty skips.
+        required: false
+        default: ""
+        type: string
+      public_smoke_url:
+        description: External URL hit from runner after deploy. Empty skips.
+        required: false
+        default: ""
+        type: string
+      ref:
+        description: Git ref to deploy.
+        required: false
+        default: ""
+        type: string
+    secrets:
+      VPS_HOST:
+        required: true
+      VPS_USER:
+        required: true
+      VPS_PORT:
+        required: true
+      VPS_SSH_KEY:
+        required: true
+
+concurrency:
+  group: vps-deploy-${{ inputs.service_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy ${{ inputs.service_name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SERVICE_NAME: ${{ inputs.service_name }}
+      APP_DIR: ${{ inputs.app_dir }}
+      CLEAN_PATHS: ${{ inputs.clean_paths }}
+      BUILD_CMD: ${{ inputs.build_cmd }}
+      REMOTE_SETUP: ${{ inputs.remote_setup }}
+      DEPLOY_SCRIPT: ${{ inputs.deploy_script }}
+      HEALTH_URL: ${{ inputs.health_url }}
+      PUBLIC_SMOKE_URL: ${{ inputs.public_smoke_url }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+
+      - name: Optional local build
+        if: ${{ inputs.build_cmd != '' }}
+        run: bash -c "$BUILD_CMD"
+
+      - name: Clean target tree on VPS
+        if: ${{ inputs.clean_paths != '' }}
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script_stop: true
+          envs: APP_DIR,CLEAN_PATHS
+          script: |
+            set -euo pipefail
+            mkdir -p "$APP_DIR"
+            cd "$APP_DIR"
+            while IFS= read -r line; do
+              line="$(echo "$line" | sed 's/^ *//; s/ *$//')"
+              [ -z "$line" ] && continue
+              echo "+ rm -rf $line"
+              rm -rf $line
+            done <<< "$CLEAN_PATHS"
+
+      - name: Upload sources to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          source: ${{ inputs.source_glob }}
+          target: ${{ inputs.app_dir }}
+          overwrite: true
+
+      - name: Remote setup + deploy + restart
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script_stop: true
+          envs: APP_DIR,SERVICE_NAME,REMOTE_SETUP,DEPLOY_SCRIPT
+          script: |
+            set -euo pipefail
+            cd "$APP_DIR"
+            if [ -n "$REMOTE_SETUP" ]; then
+              while IFS= read -r line; do
+                line="$(echo "$line" | sed 's/^ *//; s/ *$//')"
+                [ -z "$line" ] && continue
+                echo "+ $line"
+                bash -c "$line"
+              done <<< "$REMOTE_SETUP"
+            fi
+            if [ -n "$DEPLOY_SCRIPT" ]; then
+              echo "+ bash $DEPLOY_SCRIPT"
+              bash "$DEPLOY_SCRIPT"
+            else
+              echo "+ sudo systemctl restart $SERVICE_NAME"
+              sudo systemctl restart "$SERVICE_NAME"
+            fi
+            sudo systemctl --no-pager --full status "$SERVICE_NAME" | head -20 || true
+
+      - name: Internal health probe on VPS
+        if: ${{ inputs.health_url != '' }}
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script_stop: true
+          envs: HEALTH_URL
+          script: |
+            set -euo pipefail
+            for i in $(seq 1 20); do
+              if curl -fsS --max-time 5 "$HEALTH_URL" >/dev/null; then
+                echo "Internal health OK"
+                exit 0
+              fi
+              sleep 3
+            done
+            echo "Internal health check failed: $HEALTH_URL"
+            exit 1
+
+      - name: Public smoke from runner
+        if: ${{ inputs.public_smoke_url != '' }}
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 5); do
+            if curl -fsS --max-time 20 "$PUBLIC_SMOKE_URL" >/dev/null; then
+              echo "Public smoke OK"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Public smoke failed: $PUBLIC_SMOKE_URL"
+          exit 1
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## VPS deploy: $SERVICE_NAME"
+            echo "- App dir: \`$APP_DIR\`"
+            echo "- Internal health: \`${HEALTH_URL:-skipped}\`"
+            echo "- Public smoke: \`${PUBLIC_SMOKE_URL:-skipped}\`"
+          } >> "$GITHUB_STEP_SUMMARY"

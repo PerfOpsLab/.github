@@ -1,0 +1,16 @@
+name: Security gate
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  security:
+    uses: PerfOpsLab/.github/.github/workflows/reusable-security-gate.yml@main

@@ -1,0 +1,27 @@
+name: Epic
+description: Multi-PR initiative with a shared goal and a list of tasks.
+title: "[EPIC] "
+labels: ["type/epic"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+    validations:
+      required: true
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Tasks
+      description: Checklist of `[TASK]` issue links, each scoped to a single PR.
+      value: |
+        - [ ] #
+        - [ ] #
+  - type: textarea
+    id: business_value
+    attributes:
+      label: Business value
+  - type: input
+    id: linear
+    attributes:
+      label: Linear epic ID

@@ -1,0 +1,59 @@
+name: Reusable Go CI
+
+on:
+  workflow_call:
+    inputs:
+      go_version_file:
+        required: false
+        default: "go.mod"
+        type: string
+      run_lint:
+        required: false
+        default: true
+        type: boolean
+      run_race:
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    name: Build, test, lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      RUN_RACE: ${{ inputs.run_race }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: ${{ inputs.go_version_file }}
+          cache: true
+      - name: gofmt check
+        run: |
+          out=$(gofmt -l .)
+          if [ -n "$out" ]; then
+            echo "::error title=gofmt::Files need formatting:"
+            echo "$out"
+            exit 1
+          fi
+      - name: go vet
+        run: go vet ./...
+      - name: Install golangci-lint
+        if: ${{ inputs.run_lint }}
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.62.2
+          args: --timeout=5m
+      - name: Build
+        run: go build ./...
+      - name: Test
+        run: |
+          if [ "$RUN_RACE" = "true" ]; then
+            go test -race -count=1 ./...
+          else
+            go test -count=1 ./...
+          fi

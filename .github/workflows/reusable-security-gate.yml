@@ -1,0 +1,99 @@
+name: Reusable security gate
+
+on:
+  workflow_call:
+    inputs:
+      gitleaks_version:
+        description: Pinned gitleaks release. Free CLI; no GITLEAKS_LICENSE needed.
+        required: false
+        default: "8.30.1"
+        type: string
+      run_npm_audit:
+        description: Run `npm audit` if package-lock.json is present.
+        required: false
+        default: true
+        type: boolean
+      run_govulncheck:
+        description: Run `govulncheck ./...` if go.mod is present.
+        required: false
+        default: true
+        type: boolean
+      audit_level:
+        description: Severity floor for npm audit.
+        required: false
+        default: "high"
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  gitleaks:
+    name: Gitleaks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GITLEAKS_VERSION: ${{ inputs.gitleaks_version }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Install gitleaks
+        run: |
+          set -euo pipefail
+          tarball="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          url="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/${tarball}"
+          curl -fsSL -o /tmp/gitleaks.tgz "$url"
+          tar -xzf /tmp/gitleaks.tgz -C /tmp gitleaks
+          sudo install -m 0755 /tmp/gitleaks /usr/local/bin/gitleaks
+          gitleaks version
+      - name: Scan repository history for secrets
+        run: gitleaks detect --source . --no-banner --redact --verbose
+
+  npm-audit:
+    name: npm audit (advisory)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: ${{ inputs.run_npm_audit }}
+    env:
+      AUDIT_LEVEL: ${{ inputs.audit_level }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: check
+        run: |
+          if [ ! -f package-lock.json ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-node@v6
+        if: steps.check.outputs.skip != 'true'
+        with:
+          node-version: "20"
+          cache: "npm"
+      - if: steps.check.outputs.skip != 'true'
+        run: npm ci
+      - if: steps.check.outputs.skip != 'true'
+        run: npm audit --audit-level="$AUDIT_LEVEL"
+        continue-on-error: true
+
+  govulncheck:
+    name: govulncheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: ${{ inputs.run_govulncheck }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: check
+        run: |
+          if [ ! -f go.mod ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-go@v6
+        if: steps.check.outputs.skip != 'true'
+        with:
+          go-version-file: go.mod
+          cache: true
+      - if: steps.check.outputs.skip != 'true'
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck ./...
