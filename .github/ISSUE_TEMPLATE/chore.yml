@@ -1,7 +1,7 @@
-name: Task
-description: Concrete unit of work scoped to a single PR.
-title: "[TASK] "
-labels: ["type/task"]
+name: Chore
+description: Maintenance work — deps, infra, refactor, docs, CI hygiene.
+title: "[CHORE] "
+labels: ["type/chore"]
 body:
   - type: textarea
     id: goal
@@ -11,15 +11,15 @@ body:
     validations:
       required: true
   - type: textarea
-    id: context
+    id: motivation
     attributes:
-      label: Context
-      description: Why does this matter? Link to epic / Linear ticket if any.
+      label: Motivation
+      description: Why now? Tech debt, upgrade window, risk reduction, cost.
   - type: textarea
-    id: requirements
+    id: scope
     attributes:
-      label: Requirements
-      description: Bullet list of what the implementation must do.
+      label: Scope
+      description: Files/services touched, what is explicitly out of scope.
   - type: input
     id: linear
     attributes:
