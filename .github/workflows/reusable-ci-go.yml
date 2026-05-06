@@ -7,6 +7,11 @@ on:
         required: false
         default: "go.mod"
         type: string
+      working_directory:
+        description: Directory containing go.mod (e.g. apps/api for monorepos).
+        required: false
+        default: "."
+        type: string
       run_lint:
         required: false
         default: true
@@ -24,14 +29,18 @@ jobs:
     name: Build, test, lint
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_directory }}
     env:
       RUN_RACE: ${{ inputs.run_race }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-go@v6
         with:
-          go-version-file: ${{ inputs.go_version_file }}
+          go-version-file: ${{ inputs.working_directory }}/${{ inputs.go_version_file }}
           cache: true
+          cache-dependency-path: ${{ inputs.working_directory }}/go.sum
       - name: gofmt check
         run: |
           out=$(gofmt -l .)
@@ -48,9 +57,8 @@ jobs:
         with:
           version: v1.62.2
           args: --timeout=5m
-      - name: Build
-        run: go build ./...
-      - name: Test
+          working-directory: ${{ inputs.working_directory }}
+      - name: go test
         run: |
           if [ "$RUN_RACE" = "true" ]; then
             go test -race -count=1 ./...
