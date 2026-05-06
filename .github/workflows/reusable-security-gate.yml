@@ -23,6 +23,11 @@ on:
         required: false
         default: "high"
         type: string
+      govulncheck_version:
+        description: Pinned govulncheck release. v1.1.4 is the last that supports Go 1.22; bump only when raising go.mod's go directive across all callers.
+        required: false
+        default: "v1.1.4"
+        type: string
 
 permissions:
   contents: read
@@ -94,6 +99,8 @@ jobs:
           go-version-file: go.mod
           cache: true
       - if: steps.check.outputs.skip != 'true'
+        env:
+          GOVULNCHECK_VERSION: ${{ inputs.govulncheck_version }}
         run: |
-          go install golang.org/x/vuln/cmd/govulncheck@latest
+          go install "golang.org/x/vuln/cmd/govulncheck@${GOVULNCHECK_VERSION}"
           govulncheck ./...
