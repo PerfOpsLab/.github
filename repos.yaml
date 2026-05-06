@@ -40,7 +40,6 @@ product_lines:
         ci: [reusable-security-gate]
       - name: nfr-library
         stack: yaml-md
-        visibility: public
         ci: [reusable-security-gate]
       - name: grafana-dashboards
         stack: grafana-json
@@ -83,6 +82,20 @@ product_lines:
           target: vps
           service: telegram-reminder-simple.service
         ci: [reusable-ci-go, reusable-security-gate]
+
+  documentation:
+    description: Architecture diagrams and the canonical docs site.
+    repos:
+      - name: architecture
+        stack: markdown-mermaid
+        notes: Canonical source for architecture diagrams and the docs site at https://maslinka.ohbah.com:8443/docs/.
+        deploy:
+          target: vps
+          service: perfops-docs
+          path: /home/jarvis/public/perfops-docs
+          public_url: https://maslinka.ohbah.com:8443/docs/
+        ci: [reusable-security-gate, reusable-deploy-vps]
+
   transferred_out:
     description: Formerly in the org, now owned by individuals. Listed for traceability.
     repos:
@@ -100,7 +113,6 @@ product_lines:
         notes: Org profile, agent guidance, reusable workflows, this manifest.
       - name: awesome-performance-engineering
         stack: md
-        visibility: public
       - name: muntianus-portfolio
         stack: typescript
 
@@ -115,10 +127,10 @@ product_lines:
       - name: ig-unfollow
         stack: nodejs-playwright
 
-  archived_candidates:
-    description: To be archived in cleanup pass — not active development.
+  archived:
+    description: Archived in GitHub. Kept for traceability.
     repos:
       - name: demo-repository
-        action: archive
+        archived: true
       - name: improved-parakeet-demo-repository
-        action: archive
+        archived: true
