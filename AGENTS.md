@@ -36,6 +36,28 @@ VPS host: `94.228.161.100`, ssh on port `5555`. Reverse proxy: Caddy on `:8443`.
 5. **Linear is the active backlog.** When work is tied to a Linear ticket, mention the ID in the PR body, move the ticket to `In Progress`, and only mark `Done` after verification.
 6. **Token budget.** Auto-loaded files (this `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`) stay short. Detail goes into linked docs (load on demand).
 7. **PR visibility.** Open a draft PR on first push so CI and other agents see the line of work. Bypass only if the human explicitly asked for a direct push to `main`.
+8. **Docs update on substantive work.** If the change affects architecture, topology, infra, public contracts, or operational state, update the corresponding doc surface (see "Doc update protocol" below) in the same PR or a follow-up. Trivial work (typos, dependency bumps, single-file edits) is exempt — the auto session log captures it.
+
+## Doc update protocol
+
+PerfOpsLab keeps its operational/architectural truth in three places. After
+substantive work, update the relevant one. Do not silently change architecture
+without updating diagrams.
+
+| Surface | When to update | How |
+|---|---|---|
+| [`PerfOpsLab/architecture`](https://github.com/PerfOpsLab/architecture) | New service / removed component / topology shift / contract change (e.g. `verdict.json` schema) | Open PR; Mermaid renders on github.com — preview before push. Auto-deploys to <https://maslinka.ohbah.com:8443/docs/>. |
+| Vault `STATUS.md` | Infra state change (Caddy edit, secret slot, service deploy, DNS), session-level decisions worth surfacing next time | Append a dated entry under "Что сделано" — never delete history. Auto-syncs to live `/graph` via the kb-sync hook. |
+| Repo-local `docs/kb/<topic>.md` | Non-trivial finding (subtle bug, gotcha, root-cause writeup) tied to a specific repo | Use the kb frontmatter template; commit alongside the fix. |
+
+**Helper skill** (Claude Code agents): invoke `update-perfops-docs` at session
+end. It surveys git deltas and routes to the right surface. Other AI agents
+follow this section by hand — same outcomes.
+
+**Auto-mechanism for Claude Code:** the user's `~/bin/perfopslab-doc-update.sh`
+runs as a Stop hook and appends a session block to
+`~/Documents/Obsidian Vault/PerfOpsLab/sessions/YYYY-MM-DD.md`. This is the
+*minimum* — it's a journal, not a substitute for the protocol above.
 
 ## Per-language quick reference
 
