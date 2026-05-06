@@ -5,6 +5,19 @@
 version: 1
 
 product_lines:
+  platform:
+    description: PerfOps Platform — production lifecycle control plane (v1 = Mode B; A and C on roadmap).
+    repos:
+      - name: platform
+        stack: go-nextjs-postgres
+        kind: monorepo
+        deploy:
+          target: vps
+          mode: docker-compose
+        ci: [reusable-ci-go, reusable-ci-node, reusable-security-gate, reusable-deploy-vps]
+        notes: |
+          Spec: /docs/#/specs/2026-05-06-platform-v1-design ·
+          Plan: /docs/#/plans/2026-05-06-platform-v1-mode-b
   launch_gate:
     description: Release-gate engine and surrounding tooling.
     repos:
