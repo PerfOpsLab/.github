@@ -1,0 +1,158 @@
+#!/usr/bin/env python3
+"""Render PerfOpsLab/.github profile README from live org state + repos.yaml manifest.
+
+Inputs (read from CWD when run inside .github repo checkout):
+- repos.yaml — manifest of product lines and repos
+- AGENTS.md — org canon (linked, not embedded)
+
+External:
+- gh CLI must be available and authenticated. Used to fetch repo list + recent commits.
+
+Output:
+- profile/README.md — rewritten in-place. Idempotent: same input → same output.
+
+Used by .github/workflows/update-profile-readme.yml (scheduled + on-demand).
+"""
+from __future__ import annotations
+
+import json
+import os
+import subprocess
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+ORG = "PerfOpsLab"
+REPO_BASE = f"https://github.com/{ORG}"
+LIVE_DOCS = "https://maslinka.ohbah.com:8443/docs/"
+LIVE_GRAPH = "https://maslinka.ohbah.com:8443/graph"
+
+
+def run(cmd: list[str]) -> str:
+    return subprocess.check_output(cmd, text=True).strip()
+
+
+def gh_repos() -> list[dict]:
+    out = run([
+        "gh", "repo", "list", ORG,
+        "--limit", "100",
+        "--json", "name,description,visibility,isArchived,pushedAt,primaryLanguage,stargazerCount",
+    ])
+    return json.loads(out)
+
+
+def yaml_load(path: Path) -> dict | None:
+    if not path.exists():
+        return None
+    try:
+        import yaml  # type: ignore
+        return yaml.safe_load(path.read_text())
+    except ImportError:
+        # Fallback: a tiny subset parser is overkill here; require pyyaml
+        sys.stderr.write("pyyaml not installed; skipping repos.yaml integration\n")
+        return None
+
+
+def render(repos: list[dict], manifest: dict | None) -> str:
+    active = [r for r in repos if not r["isArchived"]]
+    archived = [r for r in repos if r["isArchived"]]
+    public = [r for r in active if r["visibility"] == "PUBLIC"]
+
+    lines: list[str] = []
+    a = lines.append
+
+    a("<div align=\"center\">")
+    a("")
+    a("# PerfOpsLab")
+    a("")
+    a("**Performance, reliability, and FinOps tooling for revenue-critical systems.**")
+    a("")
+    a("[Live docs]({live_docs}) · [Knowledge graph]({live_graph}) · [Org canon (AGENTS.md)]({base}/.github/blob/main/AGENTS.md) · [Repo manifest]({base}/.github/blob/main/repos.yaml)".format(
+        live_docs=LIVE_DOCS, live_graph=LIVE_GRAPH, base=REPO_BASE,
+    ))
+    a("")
+    a("</div>")
+    a("")
+    a("---")
+    a("")
+    a("## What we are")
+    a("")
+    a("PerfOpsLab ships **performance, reliability, FinOps, and AI-infra** tooling. The flagship is")
+    a("**launchgate** — a deterministic release-gate engine that emits `GO`, `CONDITIONAL_GO`, or `NO_GO`")
+    a("from a traffic model + SLO policy + load-test results.")
+    a("")
+    a("Architecture diagrams, deployment topology, and live status:")
+    a(f"<{LIVE_DOCS}> *(updates automatically on every push to PerfOpsLab/architecture)*.")
+    a("")
+
+    if manifest and "product_lines" in manifest:
+        a("## Product lines")
+        a("")
+        for line_key, line in (manifest.get("product_lines") or {}).items():
+            label = line_key.replace("_", " ").title()
+            desc = line.get("description", "")
+            a(f"### {label}")
+            if desc:
+                a(f"_{desc}_")
+            a("")
+            for r in line.get("repos") or []:
+                name = r.get("name", "")
+                stack = r.get("stack", "")
+                notes = r.get("notes") or r.get("role") or ""
+                bits = [x for x in [stack, notes] if x]
+                a(f"- [`{name}`]({REPO_BASE}/{name}) — {' · '.join(bits)}" if bits else f"- [`{name}`]({REPO_BASE}/{name})")
+            a("")
+
+    a("## Quick stats")
+    a("")
+    a(f"- Active repos: **{len(active)}**")
+    a(f"- Public: **{len(public)}**")
+    a(f"- Archived: **{len(archived)}**")
+    a("")
+
+    a("## Recently pushed")
+    a("")
+    a("| Repo | Pushed | Lang | Visibility |")
+    a("| --- | --- | --- | --- |")
+    recent = sorted(active, key=lambda r: r.get("pushedAt") or "", reverse=True)[:8]
+    for r in recent:
+        pushed = (r.get("pushedAt") or "")[:10]
+        lang = (r.get("primaryLanguage") or {}).get("name") or "—"
+        vis = "🌐 public" if r["visibility"] == "PUBLIC" else "🔒 private"
+        a(f"| [{r['name']}]({REPO_BASE}/{r['name']}) | {pushed} | {lang} | {vis} |")
+    a("")
+
+    a("## Working with this org")
+    a("")
+    a(f"- **Agents:** read [`AGENTS.md`]({REPO_BASE}/.github/blob/main/AGENTS.md) before any non-trivial change. Repo-local `AGENTS.md` overrides org rules.")
+    a(f"- **Reusable workflows:** [`.github/workflows/reusable-*.yml`]({REPO_BASE}/.github/tree/main/.github/workflows). Don't copy-paste CI; call them.")
+    a(f"- **Manifest of repos:** [`repos.yaml`]({REPO_BASE}/.github/blob/main/repos.yaml).")
+    a(f"- **Issue/PR conventions:** [`CONTRIBUTING.md`]({REPO_BASE}/.github/blob/main/CONTRIBUTING.md).")
+    a("")
+
+    a("---")
+    a("")
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    a(f"<sub>This README is regenerated by `.github/workflows/update-profile-readme.yml`. Last refresh: {now}.</sub>")
+    a("")
+    return "\n".join(lines)
+
+
+def main() -> int:
+    cwd = Path.cwd()
+    manifest = yaml_load(cwd / "repos.yaml")
+    repos = gh_repos()
+    out = render(repos, manifest)
+    target = cwd / "profile" / "README.md"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    existing = target.read_text() if target.exists() else ""
+    if existing.strip() == out.strip():
+        print("profile/README.md unchanged")
+        return 0
+    target.write_text(out)
+    print(f"profile/README.md updated ({len(out)} bytes)")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
