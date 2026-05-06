@@ -5,57 +5,48 @@ on:
     inputs:
       node_version:
         required: false
-        default: "20"
+        default: "24"
+        type: string
+      working_directory:
+        description: Directory containing package.json (e.g. apps/web for monorepos).
+        required: false
+        default: "."
         type: string
       install_cmd:
         required: false
         default: "npm ci"
         type: string
-      run_cmd:
-        description: Aggregated check command (lint+typecheck+test+build). Empty disables.
+      build_cmd:
         required: false
-        default: "npm run check"
+        default: "npm run build"
         type: string
-      fallback_cmds:
-        description: Newline-separated commands run when run_cmd is empty.
+      test_cmd:
         required: false
-        default: |
-          npm run lint --if-present
-          npm run typecheck --if-present
-          npm test --if-present
-          npm run build --if-present
+        default: ""
         type: string
 
 permissions:
   contents: read
 
 jobs:
-  ci:
-    name: Lint · typecheck · test · build
+  build:
+    name: Build, test, lint
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    env:
-      INSTALL_CMD: ${{ inputs.install_cmd }}
-      RUN_CMD: ${{ inputs.run_cmd }}
-      FALLBACK_CMDS: ${{ inputs.fallback_cmds }}
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_directory }}
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.node_version }}
-          cache: "npm"
+          cache: npm
+          cache-dependency-path: ${{ inputs.working_directory }}/package-lock.json
       - name: Install
-        run: bash -c "$INSTALL_CMD"
-      - name: Run aggregated check
-        if: ${{ inputs.run_cmd != '' }}
-        run: bash -c "$RUN_CMD"
-      - name: Run fallback steps
-        if: ${{ inputs.run_cmd == '' }}
-        run: |
-          set -e
-          while IFS= read -r line; do
-            line="$(echo "$line" | sed 's/^ *//; s/ *$//')"
-            [ -z "$line" ] && continue
-            echo "+ $line"
-            bash -c "$line"
-          done <<< "$FALLBACK_CMDS"
+        run: ${{ inputs.install_cmd }}
+      - name: Build
+        run: ${{ inputs.build_cmd }}
+      - name: Test
+        if: ${{ inputs.test_cmd != '' }}
+        run: ${{ inputs.test_cmd }}
