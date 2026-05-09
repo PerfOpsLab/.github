@@ -58,6 +58,14 @@ on:
         required: false
         default: ""
         type: string
+      runner_label:
+        description: |
+          Runner to execute the deploy job on. Default `ubuntu-latest` (GitHub-hosted).
+          Pass a self-hosted label (e.g. `vps-deploy`) to run the deploy locally on
+          the target VPS — saves Actions minutes and is faster (no internet round-trip).
+        required: false
+        default: ubuntu-latest
+        type: string
     secrets:
       VPS_HOST:
         required: true
@@ -78,7 +86,7 @@ permissions:
 jobs:
   deploy:
     name: Deploy ${{ inputs.service_name }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runner_label }}
     timeout-minutes: 30
     env:
       SERVICE_NAME: ${{ inputs.service_name }}
