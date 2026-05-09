@@ -27,6 +27,12 @@ REPO_BASE = f"https://github.com/{ORG}"
 LIVE_DOCS = "https://maslinka.ohbah.com:8443/docs/"
 LIVE_GRAPH = "https://maslinka.ohbah.com:8443/graph"
 
+# Display labels for product_lines keys whose Title-case form is wrong
+# (acronyms, mixed case). Anything not listed falls back to title-case.
+PRODUCT_LINE_LABELS = {
+    "saas": "SaaS",
+}
+
 
 def run(cmd: list[str]) -> str:
     return subprocess.check_output(cmd, text=True).strip()
@@ -89,7 +95,7 @@ def render(repos: list[dict], manifest: dict | None) -> str:
         a("## Product lines")
         a("")
         for line_key, line in (manifest.get("product_lines") or {}).items():
-            label = line_key.replace("_", " ").title()
+            label = PRODUCT_LINE_LABELS.get(line_key, line_key.replace("_", " ").title())
             desc = line.get("description", "")
             a(f"### {label}")
             if desc:
