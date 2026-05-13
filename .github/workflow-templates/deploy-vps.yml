@@ -15,10 +15,12 @@ jobs:
   deploy:
     uses: PerfOpsLab/.github/.github/workflows/reusable-deploy-vps.yml@main
     with:
-      service_name: $SERVICE_NAME.service
-      app_dir: /home/jarvis/$SERVICE_NAME
+      # Replace these with your service name and internal port before first run.
+      # `with:` values are not shell-expanded — write literal strings here.
+      service_name: my-service.service
+      app_dir: /home/jarvis/my-service
       source_glob: "."
-      health_url: http://127.0.0.1:$PORT/health
+      health_url: http://127.0.0.1:3000/health
     secrets:
       VPS_HOST: ${{ secrets.VPS_HOST }}
       VPS_USER: ${{ secrets.VPS_USER }}
