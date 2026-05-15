@@ -195,6 +195,7 @@ jobs:
               bash "$DEPLOY_SCRIPT"
             else
               echo "+ sudo systemctl restart $SERVICE_NAME"
+              sudo systemctl reset-failed "$SERVICE_NAME" 2>/dev/null || true
               sudo systemctl restart "$SERVICE_NAME"
             fi
             sudo systemctl --no-pager --full status "$SERVICE_NAME" | head -20 || true
