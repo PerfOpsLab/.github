@@ -1,0 +1,59 @@
+name: OpenAPI Sync
+
+on:
+  workflow_call:
+    inputs:
+      swagger_entry:
+        description: 'Main package path for swag (e.g., ./cmd/server)'
+        type: string
+        default: './cmd/...'
+      output_dir:
+        description: 'Output directory for generated docs'
+        type: string
+        default: 'docs'
+
+jobs:
+  openapi-sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+          cache: true
+
+      - name: Install swag
+        run: go install github.com/swaggo/swag/cmd/swag@latest
+
+      - name: Generate OpenAPI docs
+        env:
+          SWAGGER_ENTRY: ${{ inputs.swagger_entry }}
+          OUTPUT_DIR: ${{ inputs.output_dir }}
+        run: |
+          swag init -g "${SWAGGER_ENTRY}/main.go" \
+            --output "${OUTPUT_DIR}" \
+            --outputTypes json,yaml 2>/dev/null || \
+          swag init --output "${OUTPUT_DIR}" \
+            --outputTypes json,yaml 2>/dev/null || \
+          echo "swag not applicable, skipping"
+
+      - name: Commit if changed
+        env:
+          OUTPUT_DIR: ${{ inputs.output_dir }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          if ! git diff --quiet "${OUTPUT_DIR}/swagger.json" \
+              "${OUTPUT_DIR}/swagger.yaml" 2>/dev/null; then
+            git add "${OUTPUT_DIR}/swagger.json" \
+              "${OUTPUT_DIR}/swagger.yaml" 2>/dev/null || true
+            git commit -m "docs: auto-update OpenAPI spec [skip ci]" || true
+            git push
+          else
+            echo "No OpenAPI changes"
+          fi
