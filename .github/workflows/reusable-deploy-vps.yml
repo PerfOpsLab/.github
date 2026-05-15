@@ -23,6 +23,11 @@ on:
         description: Comma-separated source paths (passed to appleboy/scp-action).
         required: true
         type: string
+      stop_before_deploy:
+        description: Stop systemd service before uploading files (prevents "text file busy").
+        required: false
+        default: false
+        type: boolean
       go_version_file:
         description: Path to go.mod for actions/setup-go. Empty skips Go setup.
         required: false
@@ -139,6 +144,20 @@ jobs:
               echo "+ rm -rf $line"
               rm -rf $line
             done <<< "$CLEAN_PATHS"
+
+      - name: Stop service before deploy
+        if: ${{ inputs.stop_before_deploy }}
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          envs: SERVICE_NAME,APP_DIR
+          script: |
+            set -euo pipefail
+            mkdir -p "$APP_DIR"
+            sudo systemctl stop "$SERVICE_NAME" || true
 
       - name: Upload sources to VPS
         uses: appleboy/scp-action@v0.1.7
