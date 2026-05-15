@@ -133,17 +133,16 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
           script_stop: true
-          envs: APP_DIR,CLEAN_PATHS
           script: |
-            set -euo pipefail
-            mkdir -p "$APP_DIR"
-            cd "$APP_DIR"
-            while IFS= read -r line; do
+            set -e
+            mkdir -p "${{ inputs.app_dir }}"
+            cd "${{ inputs.app_dir }}"
+            printf '%s' "${{ inputs.clean_paths }}" | while IFS= read -r line; do
               line="$(echo "$line" | sed 's/^ *//; s/ *$//')"
               [ -z "$line" ] && continue
               echo "+ rm -rf $line"
               rm -rf $line
-            done <<< "$CLEAN_PATHS"
+            done
 
       - name: Stop service before deploy
         if: ${{ inputs.stop_before_deploy }}
@@ -153,11 +152,10 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
-          envs: SERVICE_NAME,APP_DIR
           script: |
-            set -euo pipefail
-            mkdir -p "$APP_DIR"
-            sudo systemctl stop "$SERVICE_NAME" || true
+            set -e
+            mkdir -p "${{ inputs.app_dir }}"
+            sudo systemctl stop "${{ inputs.service_name }}" || true
 
       - name: Upload sources to VPS
         uses: appleboy/scp-action@v0.1.7
@@ -178,10 +176,11 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
           script_stop: true
-          envs: APP_DIR,SERVICE_NAME,REMOTE_SETUP,DEPLOY_SCRIPT
           script: |
-            set -euo pipefail
-            cd "$APP_DIR"
+            set -e
+            cd "${{ inputs.app_dir }}"
+            REMOTE_SETUP=$'${{ inputs.remote_setup }}'
+            DEPLOY_SCRIPT="${{ inputs.deploy_script }}"
             if [ -n "$REMOTE_SETUP" ]; then
               while IFS= read -r line; do
                 line="$(echo "$line" | sed 's/^ *//; s/ *$//')"
@@ -194,11 +193,11 @@ jobs:
               echo "+ bash $DEPLOY_SCRIPT"
               bash "$DEPLOY_SCRIPT"
             else
-              echo "+ sudo systemctl restart $SERVICE_NAME"
-              sudo systemctl reset-failed "$SERVICE_NAME" 2>/dev/null || true
-              sudo systemctl restart "$SERVICE_NAME"
+              echo "+ sudo systemctl restart ${{ inputs.service_name }}"
+              sudo systemctl reset-failed "${{ inputs.service_name }}" 2>/dev/null || true
+              sudo systemctl restart "${{ inputs.service_name }}"
             fi
-            sudo systemctl --no-pager --full status "$SERVICE_NAME" | head -20 || true
+            sudo systemctl --no-pager --full status "${{ inputs.service_name }}" | head -20 || true
 
       - name: Internal health probe on VPS
         if: ${{ inputs.health_url != '' }}
@@ -209,17 +208,16 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
           script_stop: true
-          envs: HEALTH_URL
           script: |
-            set -euo pipefail
+            set -e
             for i in $(seq 1 20); do
-              if curl -fsS --max-time 5 "$HEALTH_URL" >/dev/null; then
+              if curl -fsS --max-time 5 "${{ inputs.health_url }}" >/dev/null; then
                 echo "Internal health OK"
                 exit 0
               fi
               sleep 3
             done
-            echo "Internal health check failed: $HEALTH_URL"
+            echo "Internal health check failed: ${{ inputs.health_url }}"
             exit 1
 
       - name: Public smoke from runner
