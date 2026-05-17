@@ -96,6 +96,24 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: mkdir -p ${{ inputs.app_dir }} && sudo systemctl stop ${{ inputs.service_name }} || true
 
+      - name: Clean paths on VPS
+        if: ${{ inputs.clean_paths != '' }}
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            set -euo pipefail
+            cd ${{ inputs.app_dir }}
+            while IFS= read -r path; do
+              [ -z "$path" ] && continue
+              rm -rf "$path"
+            done <<'EOF'
+            ${{ inputs.clean_paths }}
+            EOF
+
       - name: Upload sources to VPS
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -107,7 +125,23 @@ jobs:
           target: ${{ inputs.app_dir }}
           overwrite: true
 
+      - name: Run deploy script on VPS
+        if: ${{ inputs.deploy_script != '' }}
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+            cd ${{ inputs.app_dir }}
+            chmod +x ${{ inputs.deploy_script }}
+            ./${{ inputs.deploy_script }}
+
       - name: Restart service
+        if: ${{ inputs.deploy_script == '' }}
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.VPS_HOST }}

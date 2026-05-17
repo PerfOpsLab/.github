@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-go-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   ci:
     uses: muntianus/.github/.github/workflows/reusable-ci-go.yml@main
