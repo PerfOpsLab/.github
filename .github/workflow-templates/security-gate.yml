@@ -13,4 +13,4 @@ permissions:
 
 jobs:
   security:
-    uses: PerfOpsLab/.github/.github/workflows/reusable-security-gate.yml@main
+    uses: muntianus/.github/.github/workflows/reusable-security-gate.yml@main

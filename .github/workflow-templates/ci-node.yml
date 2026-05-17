@@ -11,4 +11,4 @@ permissions:
 
 jobs:
   ci:
-    uses: PerfOpsLab/.github/.github/workflows/reusable-ci-node.yml@main
+    uses: muntianus/.github/.github/workflows/reusable-ci-node.yml@main
