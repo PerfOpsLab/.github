@@ -1,4 +1,4 @@
-# Contributing to PerfOpsLab
+# Contributing to muntianus org repos
 
 The canonical workflow rules live in [`AGENTS.md`](./AGENTS.md) — read it
 first. This file covers contributor-facing branch model only.

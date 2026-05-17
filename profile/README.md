@@ -63,7 +63,7 @@ _Architecture diagrams and the canonical docs site._
 ### Transferred Out
 _Formerly in the org, now owned by individuals. Listed for traceability._
 
-- [`polymarket-arb`](https://github.com/muntianus/polymarket-arb) — Continues to call PerfOpsLab/.github reusable workflows (the .github repo is public).
+- [`polymarket-arb`](https://github.com/muntianus/polymarket-arb) — Uses `muntianus/.github` reusable workflows.
 
 ### Content
 _Public-facing or marketing repos._
