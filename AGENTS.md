@@ -1,21 +1,21 @@
 ---
-title: PerfOpsLab — agent guidance (org canonical)
-summary: Single source of truth for any AI coding agent working in any PerfOpsLab repo.
+title: muntianus — agent guidance (org canonical)
+summary: Single source of truth for any AI coding agent working in any muntianus org repo.
 status: stable
 ---
 
-# PerfOpsLab — agent guidance
+# muntianus — agent guidance
 
 > **Read order:** this file → repo-local `AGENTS.md` (overrides), `CLAUDE.md` (Claude-specific notes), `GEMINI.md` (Gemini-specific notes).
 > **Conflict rule:** repo-local file wins over org file. User instructions win over both.
 
 ## What we are
 
-PerfOpsLab ships **performance, reliability, FinOps, and AI-infra** tooling. The product line:
+GitHub org **[muntianus](https://github.com/muntianus)** (PerfOpsLab org deleted). Ships **performance, reliability, FinOps, and AI-infra** tooling:
 
 - **launchgate** — release gate engine (`GO / CONDITIONAL_GO / NO_GO`).
-- **perfOps** — SaaS control plane (UI + BFF on top of launchgate).
-- **perfops-consulting-site** — consulting funnel (Next.js 16, lives on a single VPS).
+- **perfOps** — **production** SaaS dashboard (`apps/web` → `https://maslinka.ohbah.com:8443/dashboard`).
+- **perfops-consulting-site** — archived Next.js funnel (not prod UI).
 - **k6-scenarios, chaos-scenarios, benchmark-apps, nfr-library, perfops-templates** — content.
 - **reportkit, perfops-action, perfops-sdk** — distribution.
 - **iac-monitoring-agent, grafana-dashboards** — telemetry.
@@ -32,7 +32,7 @@ VPS host: `94.228.161.100`, ssh on port `5555`. Reverse proxy: Caddy on `:8443`.
    - `reusable-ci-node.yml`
    - `reusable-deploy-vps.yml`
    Don't copy-paste workflow logic across repos.
-4. **VPS boundary.** Touch only the directory of the service you own (e.g. `/home/jarvis/perfops-consulting-site`, `/root/launchgate`) and its systemd unit. Never edit `/etc/hysteria/**`, xray, hysteria, WireGuard, or unrelated Caddy blocks.
+4. **VPS boundary.** Touch only the directory of the service you own (e.g. `/home/jarvis/perfops-web`, `/root/launchgate`) and its systemd unit. Never edit `/etc/hysteria/**`, xray, hysteria, WireGuard, or unrelated Caddy blocks.
 5. **Linear is the active backlog.** When work is tied to a Linear ticket, mention the ID in the PR body, move the ticket to `In Progress`, and only mark `Done` after verification.
 6. **Token budget.** Auto-loaded files (this `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`) stay short. Detail goes into linked docs (load on demand).
 7. **PR visibility.** Open a draft PR on first push so CI and other agents see the line of work. Bypass only if the human explicitly asked for a direct push to `main`.
@@ -40,7 +40,7 @@ VPS host: `94.228.161.100`, ssh on port `5555`. Reverse proxy: Caddy on `:8443`.
 
 ## Doc update protocol
 
-PerfOpsLab keeps its operational/architectural truth in three places. After
+The org keeps operational/architectural truth in three places. After
 substantive work, update the relevant one. Do not silently change architecture
 without updating diagrams.
 

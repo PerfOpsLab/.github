@@ -1,10 +1,10 @@
 <div align="center">
 
-# PerfOpsLab
+# muntianus
 
-**Performance, reliability, and FinOps tooling for revenue-critical systems.**
+GitHub org **muntianus** (ex-PerfOpsLab, org удалён). Performance, reliability, and FinOps tooling.
 
-[Live docs](https://maslinka.ohbah.com:8443/docs/) · [Knowledge graph](https://maslinka.ohbah.com:8443/graph) · [Org canon (AGENTS.md)](https://github.com/PerfOpsLab/.github/blob/main/AGENTS.md) · [Repo manifest](https://github.com/PerfOpsLab/.github/blob/main/repos.yaml)
+[Live docs](https://maslinka.ohbah.com:8443/docs/) · [Knowledge graph](https://maslinka.ohbah.com:8443/graph) · [Org canon (AGENTS.md)](https://github.com/muntianus/.github/blob/main/AGENTS.md) · [Repo manifest](https://github.com/muntianus/.github/blob/main/repos.yaml) · [Prod dashboard](https://maslinka.ohbah.com:8443/dashboard) (`muntianus/perfOps`)
 
 </div>
 
@@ -12,78 +12,78 @@
 
 ## What we are
 
-PerfOpsLab ships **performance, reliability, FinOps, and AI-infra** tooling. The flagship is
+The org ships **performance, reliability, FinOps, and AI-infra** tooling. The flagship is
 **launchgate** — a deterministic release-gate engine that emits `GO`, `CONDITIONAL_GO`, or `NO_GO`
 from a traffic model + SLO policy + load-test results.
 
 Architecture diagrams, deployment topology, and live status:
-<https://maslinka.ohbah.com:8443/docs/> *(updates automatically on every push to PerfOpsLab/architecture)*.
+<https://maslinka.ohbah.com:8443/docs/> *(updates on push to `muntianus/architecture`)*.
 
 ## Product lines
 
 ### Platform
 _PerfOps Platform — production lifecycle control plane (v1 = Mode B; A and C on roadmap)._
 
-- [`platform`](https://github.com/PerfOpsLab/platform) — go-nextjs-postgres · Spec: /docs/#/specs/2026-05-06-platform-v1-design ·
+- [`platform`](https://github.com/muntianus/platform) — go-nextjs-postgres · Spec: /docs/#/specs/2026-05-06-platform-v1-design ·
 Plan: /docs/#/plans/2026-05-06-platform-v1-mode-b
 
 
 ### Launch Gate
 _Release-gate engine and surrounding tooling._
 
-- [`launchgate`](https://github.com/PerfOpsLab/launchgate) — go
-- [`reportkit`](https://github.com/PerfOpsLab/reportkit) — go
-- [`perfops-action`](https://github.com/PerfOpsLab/perfops-action) — go
-- [`perfops-sdk`](https://github.com/PerfOpsLab/perfops-sdk) — go-python
-- [`k6-scenarios`](https://github.com/PerfOpsLab/k6-scenarios) — javascript-k6
-- [`chaos-scenarios`](https://github.com/PerfOpsLab/chaos-scenarios) — javascript-k6
-- [`benchmark-apps`](https://github.com/PerfOpsLab/benchmark-apps) — go
-- [`perfops-templates`](https://github.com/PerfOpsLab/perfops-templates) — yaml-md
-- [`nfr-library`](https://github.com/PerfOpsLab/nfr-library) — yaml-md
-- [`grafana-dashboards`](https://github.com/PerfOpsLab/grafana-dashboards) — grafana-json
-- [`iac-monitoring-agent`](https://github.com/PerfOpsLab/iac-monitoring-agent) — shell
+- [`launchgate`](https://github.com/muntianus/launchgate) — go
+- [`reportkit`](https://github.com/muntianus/reportkit) — go
+- [`perfops-action`](https://github.com/muntianus/perfops-action) — go
+- [`perfops-sdk`](https://github.com/muntianus/perfops-sdk) — go-python
+- [`k6-scenarios`](https://github.com/muntianus/k6-scenarios) — javascript-k6
+- [`chaos-scenarios`](https://github.com/muntianus/chaos-scenarios) — javascript-k6
+- [`benchmark-apps`](https://github.com/muntianus/benchmark-apps) — go
+- [`perfops-templates`](https://github.com/muntianus/perfops-templates) — yaml-md
+- [`nfr-library`](https://github.com/muntianus/nfr-library) — yaml-md
+- [`grafana-dashboards`](https://github.com/muntianus/grafana-dashboards) — grafana-json
+- [`iac-monitoring-agent`](https://github.com/muntianus/iac-monitoring-agent) — shell
 
 ### SaaS
 _Customer-facing SaaS surface._
 
-- [`perfOps`](https://github.com/PerfOpsLab/perfOps) — javascript-pocketbase
-- [`perfops-consulting-site`](https://github.com/PerfOpsLab/perfops-consulting-site) — nextjs
+- [`perfOps`](https://github.com/muntianus/perfOps) — **prod** SaaS (`apps/web` + PocketBase + Express on VPS)
+- [`perfops-consulting-site`](https://github.com/muntianus/perfops-consulting-site) — nextjs (**archived**)
 
 ### Bots
 _Telegram bots and side projects._
 
-- [`telegram-reminder`](https://github.com/PerfOpsLab/telegram-reminder) — go
-- [`telegram-reminder-simple`](https://github.com/PerfOpsLab/telegram-reminder-simple) — go
+- [`telegram-reminder`](https://github.com/muntianus/telegram-reminder) — go
+- [`telegram-reminder-simple`](https://github.com/muntianus/telegram-reminder-simple) — go
 
 ### Documentation
 _Architecture diagrams and the canonical docs site._
 
-- [`architecture`](https://github.com/PerfOpsLab/architecture) — markdown-mermaid · Canonical source for architecture diagrams and the docs site at https://maslinka.ohbah.com:8443/docs/.
+- [`architecture`](https://github.com/muntianus/architecture) — markdown-mermaid · Canonical source for architecture diagrams and the docs site at https://maslinka.ohbah.com:8443/docs/.
 
 ### Transferred Out
 _Formerly in the org, now owned by individuals. Listed for traceability._
 
-- [`polymarket-arb`](https://github.com/PerfOpsLab/polymarket-arb) — Continues to call PerfOpsLab/.github reusable workflows (the .github repo is public).
+- [`polymarket-arb`](https://github.com/muntianus/polymarket-arb) — Continues to call PerfOpsLab/.github reusable workflows (the .github repo is public).
 
 ### Content
 _Public-facing or marketing repos._
 
-- [`.github`](https://github.com/PerfOpsLab/.github) — meta · Org profile, agent guidance, reusable workflows, this manifest.
-- [`awesome-performance-engineering`](https://github.com/PerfOpsLab/awesome-performance-engineering) — md
-- [`muntianus-portfolio`](https://github.com/PerfOpsLab/muntianus-portfolio) — typescript
+- [`.github`](https://github.com/muntianus/.github) — meta · Org profile, agent guidance, reusable workflows, this manifest.
+- [`awesome-performance-engineering`](https://github.com/muntianus/awesome-performance-engineering) — md
+- [`muntianus-portfolio`](https://github.com/muntianus/muntianus-portfolio) — typescript
 
 ### Legacy Or Offshore
 _Repos owned by non-PerfOps initiatives, kept for now._
 
-- [`globex`](https://github.com/PerfOpsLab/globex) — react-fastapi-flutter · B2B marketplace exploration project.
-- [`order-lab`](https://github.com/PerfOpsLab/order-lab) — go-kafka
-- [`ig-unfollow`](https://github.com/PerfOpsLab/ig-unfollow) — nodejs-playwright
+- [`globex`](https://github.com/muntianus/globex) — react-fastapi-flutter · B2B marketplace exploration project.
+- [`order-lab`](https://github.com/muntianus/order-lab) — go-kafka
+- [`ig-unfollow`](https://github.com/muntianus/ig-unfollow) — nodejs-playwright
 
 ### Archived
 _Archived in GitHub. Kept for traceability._
 
-- [`demo-repository`](https://github.com/PerfOpsLab/demo-repository)
-- [`improved-parakeet-demo-repository`](https://github.com/PerfOpsLab/improved-parakeet-demo-repository)
+- [`demo-repository`](https://github.com/muntianus/demo-repository)
+- [`improved-parakeet-demo-repository`](https://github.com/muntianus/improved-parakeet-demo-repository)
 
 ## Quick stats
 
@@ -98,10 +98,10 @@ _Archived in GitHub. Kept for traceability._
 
 ## Working with this org
 
-- **Agents:** read [`AGENTS.md`](https://github.com/PerfOpsLab/.github/blob/main/AGENTS.md) before any non-trivial change. Repo-local `AGENTS.md` overrides org rules.
-- **Reusable workflows:** [`.github/workflows/reusable-*.yml`](https://github.com/PerfOpsLab/.github/tree/main/.github/workflows). Don't copy-paste CI; call them.
-- **Manifest of repos:** [`repos.yaml`](https://github.com/PerfOpsLab/.github/blob/main/repos.yaml).
-- **Issue/PR conventions:** [`CONTRIBUTING.md`](https://github.com/PerfOpsLab/.github/blob/main/CONTRIBUTING.md).
+- **Agents:** read [`AGENTS.md`](https://github.com/muntianus/.github/blob/main/AGENTS.md) before any non-trivial change. Repo-local `AGENTS.md` overrides org rules.
+- **Reusable workflows:** [`.github/workflows/reusable-*.yml`](https://github.com/muntianus/.github/tree/main/.github/workflows). Don't copy-paste CI; call them.
+- **Manifest of repos:** [`repos.yaml`](https://github.com/muntianus/.github/blob/main/repos.yaml).
+- **Issue/PR conventions:** [`CONTRIBUTING.md`](https://github.com/muntianus/.github/blob/main/CONTRIBUTING.md).
 
 ---
 
