@@ -115,7 +115,7 @@ product_lines:
       - name: polymarket-arb
         new_location: muntianus/polymarket-arb
         transferred_at: "2026-05-06"
-        notes: Continues to call PerfOpsLab/.github reusable workflows (the .github repo is public).
+        notes: Continues to call muntianus/.github reusable workflows (the .github repo is public).
 
   content:
     description: Public-facing or marketing repos.

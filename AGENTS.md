@@ -46,10 +46,10 @@ without updating diagrams.
 
 | Surface | When to update | How |
 |---|---|---|
-| [`PerfOpsLab/architecture`](https://github.com/PerfOpsLab/architecture) | New service / removed component / topology shift / contract change (e.g. `verdict.json` schema) | Open PR; Mermaid renders on github.com — preview before push. Auto-deploys to <https://maslinka.ohbah.com:8443/docs/>. |
+| [`muntianus/architecture`](https://github.com/muntianus/architecture) | New service / removed component / topology shift / contract change (e.g. `verdict.json` schema) | Open PR; Mermaid renders on github.com — preview before push. Auto-deploys to <https://maslinka.ohbah.com:8443/docs/>. |
 | Vault `STATUS.md` | Infra state change (Caddy edit, secret slot, service deploy, DNS), session-level decisions worth surfacing next time | Append a dated entry under "Что сделано" — never delete history. Auto-syncs to live `/graph` via the kb-sync hook. |
 | Repo-local `docs/kb/<topic>.md` | Non-trivial finding (subtle bug, gotcha, root-cause writeup) tied to a specific repo | Use the kb frontmatter template; commit alongside the fix. |
-| Vault `wiki/` (`PerfOpsLab/vault`) | Cross-repo knowledge: entity pages (per repo / infra), concept pages, ingested sources, autoresearch outputs | Edit per-page files or `wiki/<domain>/_index.md`; **never edit `wiki/index.md`** (regenerated). Stop hook commits + pushes with merge-driver retry. See "Vault Knowledge Base" below. |
+| Vault `wiki/` (`muntianus/vault`) | Cross-repo knowledge: entity pages (per repo / infra), concept pages, ingested sources, autoresearch outputs | Edit per-page files or `wiki/<domain>/_index.md`; **never edit `wiki/index.md`** (regenerated). Stop hook commits + pushes with merge-driver retry. See "Vault Knowledge Base" below. |
 
 **Helper skill** (Claude Code agents): invoke `update-perfops-docs` at session
 end. It surveys git deltas and routes to the right surface. Other AI agents
@@ -63,7 +63,7 @@ runs as a Stop hook and appends a session block to
 ## Vault Knowledge Base
 
 Org-wide knowledge base following the Karpathy LLM Wiki pattern, hosted at
-[`PerfOpsLab/vault`](https://github.com/PerfOpsLab/vault) (private). Local mirror:
+[`muntianus/vault`](https://github.com/muntianus/vault) (private). Local mirror:
 `~/Documents/Obsidian Vault/PerfOpsLab/`.
 
 **Read order from any repo session:**
@@ -131,7 +131,7 @@ Wire the deploy with the org reusable workflow:
 ```yaml
 jobs:
   deploy:
-    uses: PerfOpsLab/.github/.github/workflows/reusable-deploy-vps.yml@main
+    uses: muntianus/.github/.github/workflows/reusable-deploy-vps.yml@main
     with:
       service_name: <service>.service
       app_dir: /home/jarvis/<service>
