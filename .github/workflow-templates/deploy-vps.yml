@@ -11,6 +11,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: deploy-vps-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   deploy:
     uses: muntianus/.github/.github/workflows/reusable-deploy-vps.yml@main
